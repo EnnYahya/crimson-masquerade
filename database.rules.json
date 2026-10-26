@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "masquerade": {
+      ".read": true,
+      "admins": {
+        "$uid": {
+          ".write": "auth != null && (root.child('masquerade/admins/'+auth.uid).val() === true || (!root.child('masquerade/admins').exists() && auth.uid === $uid))",
+          ".validate": "newData.val() === true"
+        }
+      },
+      "users": {
+        "$uid": {
+          ".write": "auth != null && (auth.uid === $uid || root.child('masquerade/admins/'+auth.uid).val() === true)",
+          ".validate": "newData.child('username').isString() && newData.child('username').val().length <= 20"
+        }
+      },
+      "players": {
+        ".write": "auth != null && root.child('masquerade/admins/'+auth.uid).val() === true",
+        "$pid": {
+          ".write": "auth != null && auth.uid === $pid && !data.exists() && root.child('masquerade/settings/regClosed').val() !== true && newData.child('status').val() === 'mortal' && newData.child('blood').val() === (root.child('masquerade/settings/maxBlood').exists() ? root.child('masquerade/settings/maxBlood').val() : 3)",
+          ".validate": "newData.child('name').isString() && newData.child('name').val().length <= 40"
+        }
+      },
+      "spin": {
+        ".write": "auth != null && (root.child('masquerade/admins/'+auth.uid).val() === true || (root.child('masquerade/turn').val() === auth.uid && newData.child('playerId').val() === auth.uid && newData.child('resolved').val() === ''))"
+      },
+      "log": {
+        ".write": "auth != null && root.child('masquerade/admins/'+auth.uid).val() === true",
+        "$l": {
+          ".write": "auth != null",
+          ".validate": "newData.child('msg').isString() && newData.child('msg').val().length < 300"
+        }
+      },
+      "challenges": { ".write": "auth != null && root.child('masquerade/admins/'+auth.uid).val() === true" },
+      "chInit":     { ".write": "auth != null && root.child('masquerade/admins/'+auth.uid).val() === true" },
+      "settings":   { ".write": "auth != null && root.child('masquerade/admins/'+auth.uid).val() === true" },
+      "turn":       { ".write": "auth != null && root.child('masquerade/admins/'+auth.uid).val() === true" },
+      "pick":       { ".write": "auth != null && root.child('masquerade/admins/'+auth.uid).val() === true" }
+    }
+  }
+}

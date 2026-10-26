@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Crimson Masquerade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="petals" aria-hidden="true"></div>
+
+<div id="demoBanner" class="demo" hidden>
+  ⚠️ Demo mode: Firebase is not connected yet, so only this browser sees changes. Fill in <code>js/config.js</code> to go live.
+</div>
+
+<header class="hero" id="hero">
+  <img src="images/banner.webp" alt="The Crimson Masquerade" onerror="this.parentElement.classList.add('noimg');this.remove()">
+  <div class="hero-fallback">
+    <h1>The Crimson Masquerade</h1>
+    <p>Halloween Vampire Event</p>
+  </div>
+  <div id="countdown" class="countdown"></div>
+</header>
+
+<nav id="nav" class="nav">
+  <div class="tabs">
+    <button class="tab active" data-view="stage">🎡 The Wheel</button>
+    <button class="tab" data-view="mortals">🩸 Mortals</button>
+    <button class="tab" data-view="bloodlines">🦇 Bloodlines</button>
+    <button class="tab" data-view="rules">📜 Rules</button>
+    <button class="tab hostonly" data-view="host" hidden>👑 Host Panel</button>
+  </div>
+  <div class="nav-right">
+    <label class="me">I am: <select id="meSel"></select></label>
+    <button id="claimBtn" class="btn small" hidden>👑 Claim host</button>
+    <button id="loginBtn" class="btn small ghost">Sign in / Register</button>
+    <button id="cleanBtn" class="btn small ghost hostonly" hidden>Clean view</button>
+  </div>
+</nav>
+
+<main>
+  <!-- ================= THE WHEEL ================= -->
+  <section id="view-stage" class="view active">
+    <div id="finalBanner"></div>
+    <div class="stage-grid">
+      <div class="left-col">
+        <div class="wheels">
+          <div class="wheel-block">
+            <div class="wheel-cap">The Challenge</div>
+            <div class="wheel-wrap big"><div class="pointer"></div><canvas id="wheelC" width="640" height="640"></canvas></div>
+          </div>
+          <div class="wheel-block">
+            <div class="wheel-cap">The Bloodline</div>
+            <div class="wheel-wrap small"><div class="pointer"></div><canvas id="wheelB" width="440" height="440"></canvas></div>
+          </div>
+        </div>
+        <div class="spin-area">
+          <button id="spinBtn" class="btn big" disabled>🎡 Spin the Blood Wheel</button>
+          <div id="spinHint" class="hint"></div>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="panel turn-panel" id="turnPanel"></div>
+        <div class="panel result-panel" id="resultPanel"></div>
+        <div id="hostbar" class="panel hostbar" hidden></div>
+        <div class="panel" id="chronicle"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MORTALS ================= -->
+  <section id="view-mortals" class="view">
+    <h2 class="sec-title">The Guests of the Masquerade</h2>
+    <div id="mortalSummary" class="summary"></div>
+    <div id="mortalLists"></div>
+  </section>
+
+  <!-- ================= BLOODLINES ================= -->
+  <section id="view-bloodlines" class="view">
+    <h2 class="sec-title">The Four Bloodlines</h2>
+    <p class="lead">Four ancient bloodlines. Four mysterious vampires. Who hides behind each mask? Their identities shall remain a mystery… until the night of the Crimson Masquerade.</p>
+    <div id="bloodlineGrid" class="bl-grid"></div>
+  </section>
+
+  <!-- ================= RULES ================= -->
+  <section id="view-rules" class="view">
+    <h2 class="sec-title">How Does the Masquerade Work?</h2>
+    <div class="rules" id="rulesBox"></div>
+  </section>
+
+  <!-- ================= HOST PANEL ================= -->
+  <section id="view-host" class="view">
+    <h2 class="sec-title">Host Panel</h2>
+    <div class="host-grid">
+      <div class="panel">
+        <h3>Add mortals</h3>
+        <p class="hint">One name per line (use the Discord names of your guests).</p>
+        <textarea id="addNames" rows="6" placeholder="Alice&#10;Bob&#10;Charlie"></textarea>
+        <button id="addNamesBtn" class="btn">Add mortals</button>
+      </div>
+
+      <div class="panel">
+        <h3>Settings</h3>
+        <label class="row">Starting Blood
+          <input id="setMaxBlood" type="number" min="1" max="9" value="3">
+        </label>
+        <label class="row">Final Survivors (winners)
+          <input id="setFinal" type="number" min="1" max="20" value="4">
+        </label>
+        <label class="row">Close registration <input id="setReg" type="checkbox"></label>
+        <button id="saveSettingsBtn" class="btn">Save settings</button>
+        <hr>
+        <button id="resetEventBtn" class="btn danger">Restart the event (everyone back to full Blood)</button>
+        <button id="wipeBtn" class="btn danger">Delete everything</button>
+      </div>
+
+      <div class="panel wide">
+        <h3>Accounts <span id="accCount" class="hint"></span></h3>
+        <p class="hint">Everyone who registers appears here. ➕ adds them to the event, 👑 gives or removes host rights.</p>
+        <div id="accList" class="ch-list"></div>
+      </div>
+
+      <div class="panel wide">
+        <h3>Challenges on the wheel <span id="chCount" class="hint"></span></h3>
+        <div class="add-ch">
+          <textarea id="newChallenge" rows="3" placeholder="Write challenges, one per line (no limit)…"></textarea>
+          <button id="addChBtn" class="btn">Add</button>
+        </div>
+        <div id="chList" class="ch-list"></div>
+        <button id="defaultsBtn" class="btn ghost small">Reset to the default challenges</button> <button id="clearChBtn" class="btn danger small">Remove all challenges</button>
+      </div>
+
+      <div class="panel wide">
+        <h3>Chronicle (full log)</h3>
+        <div id="fullLog" class="log"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">🎭 Dress for the Masquerade, bring your courage and guard your Blood carefully. 🩸</footer>
+<dialog id="authDlg" class="dlg">
+  <form id="authForm" method="dialog">
+    <h3>🦇 Enter the Masquerade</h3>
+    <input id="authUser" type="text" placeholder="Username" autocomplete="username" maxlength="20">
+    <input id="authPass" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+    <div class="hb-row"><button class="btn" type="submit">Sign in</button><button class="btn ghost" id="authUp" type="button">Create account</button><button class="btn ghost small" id="authX" type="button">Cancel</button></div>
+  </form>
+</dialog>
+<div id="toast" class="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
