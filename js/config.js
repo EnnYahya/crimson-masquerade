@@ -10,12 +10,12 @@ window.MASQUERADE_CONFIG = {
   //    Project settings -> General -> "Your apps" -> Web app -> firebaseConfig
   //    Leave apiKey empty ("") to run in demo mode (only this browser).
   FIREBASE: {
-    apiKey: "",
-    authDomain: "",
-    databaseURL: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
+    apiKey: "AIzaSyBYqhOmOddHJ97isHglHutwFRqusPxAW58",
+    authDomain: "crimson-masquerade.firebaseapp.com",
+    databaseURL: "https://crimson-masquerade-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "crimson-masquerade",
+    storageBucket: "crimson-masquerade.firebasestorage.app",
+    messagingSenderId: "1055620175481",
+    appId: "1:1055620175481:web:cc541d241bd561872726a8"
   }
 };
